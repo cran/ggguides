@@ -1,0 +1,151 @@
+---
+title: "Legend Positioning"
+author: "Gilles Colling"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Legend Positioning}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 6,
+  fig.height = 4
+)
+library(ggguides)
+library(ggplot2)
+
+# Theme with transparent backgrounds for pkgdown light/dark mode
+theme_set(
+  theme_grey() +
+    theme(
+      plot.background = element_rect(fill = "transparent", color = NA),
+      panel.background = element_rect(fill = "transparent", color = NA),
+      legend.background = element_rect(fill = "transparent", color = NA),
+      legend.key = element_rect(fill = "transparent", color = NA),
+      legend.box.background = element_rect(fill = "transparent", color = NA)
+    )
+)
+```
+
+## Overview
+
+ggguides provides position helpers that handle legend placement without
+requiring knowledge of ggplot2's theme system. Each function sets the
+appropriate combination of `legend.position`, `legend.justification`,
+and `legend.box.just` to achieve proper alignment.
+
+## Basic Positioning
+
+### Left and Right
+
+```{r left-right, fig.show='hold', out.width='48%'}
+p <- ggplot(mtcars, aes(mpg, wt, color = factor(cyl))) +
+  geom_point(size = 3) +
+  labs(color = "Cylinders")
+
+p + legend_left() + ggtitle("Left")
+p + legend_right() + ggtitle("Right")
+```
+
+### Top and Bottom
+
+When placing legends at the top or bottom, the legend is automatically
+oriented horizontally:
+
+```{r top-bottom, fig.show='hold', out.width='48%'}
+p + legend_top() + ggtitle("Top")
+p + legend_bottom() + ggtitle("Bottom")
+```
+
+### Alignment with Titles
+
+Use the `align_to` parameter to control how the legend aligns with the plot.
+The difference is most visible when there's a y-axis label:
+
+```{r align-to, fig.show='hold', out.width='48%'}
+p_labeled <- p + labs(title = "Fuel Economy", y = "Weight (1000 lbs)")
+
+# Default: align to panel (legend aligns with the plot area)
+p_labeled + legend_top() + ggtitle("Panel alignment (default)")
+
+# Align to full plot (legend spans title/axis labels too)
+p_labeled + legend_top(align_to = "plot") + ggtitle("Plot alignment")
+```
+
+## Inside Positioning
+
+`legend_inside()` places the legend within the plot panel. You can use
+either coordinate values or named shortcuts.
+
+### Using Shortcuts
+
+Available shortcuts: `"topright"`, `"topleft"`, `"bottomright"`, `"bottomleft"`, `"center"`
+
+```{r inside-shortcuts, fig.show='hold', out.width='48%'}
+p + legend_inside(position = "topright") + ggtitle("Top right")
+p + legend_inside(position = "bottomleft") + ggtitle("Bottom left")
+```
+
+### Using Coordinates
+
+For precise control, specify x/y coordinates (0-1 scale) and justification:
+
+```{r inside-coords}
+p + legend_inside(x = 0.95, y = 0.95, just = c("right", "top"))
+```
+
+### Adding Background
+
+Inside legends often need a background for readability:
+
+```{r inside-background}
+p + legend_inside(
+  position = "topright",
+  background = "#FFF3E0",
+  border = "#FF9800"
+)
+```
+
+## Direction Control
+
+### Horizontal and Vertical
+
+Control legend entry direction independently of position:
+
+```{r direction, fig.show='hold', out.width='48%'}
+p + legend_horizontal() + ggtitle("Horizontal")
+p + legend_vertical() + ggtitle("Vertical")
+```
+
+### Combining Direction and Position
+
+```{r direction-position}
+p + legend_right() + legend_horizontal()
+```
+
+## Removing the Legend
+
+```{r legend-none}
+p + legend_none()
+```
+
+## Summary
+
+| Function | Position | Auto-Direction |
+|----------|----------|----------------|
+| `legend_left()` | Left of panel | Vertical |
+| `legend_right()` | Right of panel | Vertical |
+| `legend_top()` | Above panel | Horizontal |
+| `legend_bottom()` | Below panel | Horizontal |
+| `legend_inside()` | Inside panel | Unchanged |
+| `legend_none()` | Hidden | N/A |
+
+**Learn more:**
+
+- [Styling & Customization](styling.html) for font, background, and border options
+- [Patchwork Integration](patchwork.html) for multi-panel workflows

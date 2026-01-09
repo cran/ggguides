@@ -1,0 +1,131 @@
+## ----setup, include = FALSE---------------------------------------------------
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+library(ggguides)
+library(ggplot2)
+
+# Theme with transparent backgrounds for pkgdown light/dark mode
+theme_set(
+  theme_grey() +
+    theme(
+      plot.background = element_rect(fill = "transparent", color = NA),
+      panel.background = element_rect(fill = "transparent", color = NA),
+      legend.background = element_rect(fill = "transparent", color = NA),
+      legend.key = element_rect(fill = "transparent", color = NA),
+      legend.box.background = element_rect(fill = "transparent", color = NA)
+    )
+)
+
+## ----problem, fig.height=4----------------------------------------------------
+library(patchwork)
+
+p1 <- ggplot(mtcars, aes(mpg, wt, color = factor(cyl))) +
+  geom_point() + labs(title = "Plot 1", color = "Cylinders")
+p2 <- ggplot(mtcars, aes(mpg, hp, color = factor(cyl))) +
+  geom_point() + labs(title = "Plot 2", color = "Cylinders")
+
+# Default patchwork: duplicate legends
+p1 | p2
+
+## ----collect-basic, fig.height=4----------------------------------------------
+collect_legends(p1 | p2)
+
+## ----collect-bottom, fig.height=5---------------------------------------------
+collect_legends(p1 | p2, position = "bottom")
+
+## ----collect-left, fig.height=4-----------------------------------------------
+collect_legends(p1 | p2, position = "left")
+
+## ----stacked-default, fig.height=7--------------------------------------------
+# Create plots with different heights using plot_layout
+p3 <- ggplot(mtcars, aes(mpg, disp, color = factor(cyl))) +
+  geom_point() + labs(title = "Plot 3", color = "Cylinders")
+
+# Stack with different heights: 1, 1/2, 1/4
+stacked <- (p1 / p2 / p3) + plot_layout(heights = c(4, 2, 1))
+collect_legends(stacked, position = "right")
+
+## ----stacked-span, fig.height=7-----------------------------------------------
+gt <- collect_legends(stacked, position = "right", span = TRUE)
+grid::grid.draw(gt)
+
+## ----span-row1, fig.height=7--------------------------------------------------
+# Legend attached to row 1 only (the tallest plot)
+gt <- collect_legends(stacked, position = "right", span = 1)
+grid::grid.draw(gt)
+
+## ----span-row12, fig.height=7-------------------------------------------------
+# Legend attached to rows 1 and 2
+gt <- collect_legends(stacked, position = "right", span = 1:2)
+grid::grid.draw(gt)
+
+## ----collect-axes, fig.height=5-----------------------------------------------
+# Plots stacked vertically - x-axis is duplicated
+p_top <- ggplot(mtcars, aes(mpg, wt)) +
+  geom_point() + labs(y = "Weight")
+
+p_bottom <- ggplot(mtcars, aes(mpg, disp)) +
+  geom_point() + labs(y = "Displacement")
+
+# Without axis collection (both have x-axis)
+p_top / p_bottom
+
+## ----collect-axes-fixed, fig.height=5-----------------------------------------
+# With axis collection (removes redundant x-axis from top)
+collect_axes(p_top / p_bottom)
+
+## ----combined, fig.height=5---------------------------------------------------
+p1_styled <- p1 + legend_style(size = 11, title_face = "bold")
+p2_styled <- p2 + legend_style(size = 11, title_face = "bold")
+
+collect_legends(p1_styled | p2_styled, position = "right")
+
+## ----complex, fig.height=6----------------------------------------------------
+p4 <- ggplot(mtcars, aes(qsec, wt, color = factor(cyl))) +
+  geom_point() + labs(title = "Plot 4", color = "Cylinders")
+
+# 2x2 grid
+layout <- (p1 | p2) / (p3 | p4)
+collect_legends(layout, position = "right")
+
+## ----cowplot-setup, include=FALSE---------------------------------------------
+# Fresh plots for cowplot examples (not modified by patchwork)
+cp1 <- ggplot(mtcars, aes(mpg, wt, color = factor(cyl))) +
+  geom_point() + labs(title = "Plot 1", color = "Cylinders")
+cp2 <- ggplot(mtcars, aes(mpg, hp, color = factor(cyl))) +
+  geom_point() + labs(title = "Plot 2", color = "Cylinders")
+cp3 <- ggplot(mtcars, aes(mpg, disp, color = factor(cyl))) +
+  geom_point() + labs(title = "Plot 3", color = "Cylinders")
+cp4 <- ggplot(mtcars, aes(qsec, wt, color = factor(cyl))) +
+  geom_point() + labs(title = "Plot 4", color = "Cylinders")
+
+## ----get-legend---------------------------------------------------------------
+# Extract legend from a plot
+leg <- get_legend(cp1)
+
+# Use with cowplot::plot_grid() or grid::grid.draw()
+grid::grid.newpage()
+grid::grid.draw(leg)
+
+## ----shared-legend-side, fig.height=4-----------------------------------------
+# Side-by-side with shared legend on right
+gt <- shared_legend(cp1, cp2, ncol = 2, position = "right")
+grid::grid.newpage()
+grid::grid.draw(gt)
+
+## ----shared-legend-stacked, fig.height=6--------------------------------------
+# Stacked with legend at bottom
+gt <- shared_legend(cp1, cp2, cp3, ncol = 1, position = "bottom")
+grid::grid.newpage()
+grid::grid.draw(gt)
+
+## ----shared-legend-grid, fig.height=5-----------------------------------------
+# 2x2 grid
+gt <- shared_legend(cp1, cp2, cp3, cp4, ncol = 2, nrow = 2, position = "right")
+grid::grid.newpage()
+grid::grid.draw(gt)
+
