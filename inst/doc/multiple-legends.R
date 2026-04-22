@@ -88,6 +88,34 @@ p +
   legend_style(title_face = "bold", background = "grey95", by = "colour") +
   legend_style(size = 10, by = "size")
 
+## ----four-sides, fig.width = 8, fig.height = 6--------------------------------
+p4 <- ggplot(mtcars, aes(mpg, wt,
+                         colour = factor(cyl),
+                         fill   = factor(gear),
+                         size   = hp,
+                         shape  = factor(am))) +
+  geom_point(stroke = 1.2) +
+  labs(colour = "Cyl", fill = "Gear", size = "HP", shape = "AM")
+
+p4 +
+  # 1. Send each legend to its side
+  legend_top   (by = "colour") +
+  legend_bottom(by = "fill")   +
+  legend_left  (by = "size")   +
+  legend_right (by = "shape")  +
+
+  # 2. Slide each legend along its side
+  legend_style(by = "colour", justification = "left") +
+  legend_style(by = "fill",   justification = "right") +
+  legend_style(by = "size",   justification = "top") +
+  legend_style(by = "shape",  justification = "bottom") +
+
+  # 3. Nudge each legend toward/away from the panel via margin (cm)
+  legend_style(by = "colour", margin = c(0, 0, 0.3, 0)) +
+  legend_style(by = "fill",   margin = c(0.3, 0, 0, 0)) +
+  legend_style(by = "size",   margin = c(0, 0.3, 0, 0)) +
+  legend_style(by = "shape",  margin = c(0, 0, 0, 0.3))
+
 ## ----combined-----------------------------------------------------------------
 # Complex example: hide shape, position colour on left with bold title,
 # position size at bottom with smaller text
