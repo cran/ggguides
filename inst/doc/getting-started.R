@@ -21,6 +21,9 @@ theme_set(
 )
 
 ## ----eval=FALSE---------------------------------------------------------------
+# install.packages("ggguides")
+
+## ----eval=FALSE---------------------------------------------------------------
 # # install.packages("pak")
 # pak::pak("gcol33/ggguides")
 
@@ -41,7 +44,7 @@ p + legend_bottom()
 p + legend_inside(position = "topright")
 
 ## ----inside-coords------------------------------------------------------------
-p + legend_inside(x = 0.02, y = 0.98, just = c("left", "top"))
+p + legend_inside(x = 0.02, y = 0.98, justification = c("left", "top"))
 
 ## ----legend-none--------------------------------------------------------------
 p + legend_none()

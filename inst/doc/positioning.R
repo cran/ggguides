@@ -46,7 +46,7 @@ p + legend_inside(position = "topright") + ggtitle("Top right")
 p + legend_inside(position = "bottomleft") + ggtitle("Bottom left")
 
 ## ----inside-coords------------------------------------------------------------
-p + legend_inside(x = 0.95, y = 0.95, just = c("right", "top"))
+p + legend_inside(x = 0.95, y = 0.95, justification = c("right", "top"))
 
 ## ----inside-background--------------------------------------------------------
 p + legend_inside(

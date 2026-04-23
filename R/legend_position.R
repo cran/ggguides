@@ -58,12 +58,10 @@ legend_left <- function(by = NULL) {
       legend.box.just = "left"
     )
   } else {
-    by <- normalize_aesthetic(by)
-    guides_args <- stats::setNames(
-      list(guide_legend(position = "left")),
-      by
+    ggguides_guide_update(
+      by = normalize_aesthetic(by),
+      guide_params = list(position = "left")
     )
-    do.call(guides, guides_args)
   }
 }
 
@@ -116,12 +114,10 @@ legend_right <- function(by = NULL) {
       legend.box.just = "right"
     )
   } else {
-    by <- normalize_aesthetic(by)
-    guides_args <- stats::setNames(
-      list(guide_legend(position = "right")),
-      by
+    ggguides_guide_update(
+      by = normalize_aesthetic(by),
+      guide_params = list(position = "right")
     )
-    do.call(guides, guides_args)
   }
 }
 
@@ -168,12 +164,10 @@ legend_right <- function(by = NULL) {
 #' @export
 legend_top <- function(align_to = c("panel", "plot"), by = NULL) {
   if (!is.null(by)) {
-    by <- normalize_aesthetic(by)
-    guides_args <- stats::setNames(
-      list(guide_legend(position = "top", direction = "horizontal")),
-      by
-    )
-    return(do.call(guides, guides_args))
+    return(ggguides_guide_update(
+      by = normalize_aesthetic(by),
+      guide_params = list(position = "top", direction = "horizontal")
+    ))
   }
 
   align_to <- match.arg(align_to)
@@ -235,12 +229,10 @@ legend_top <- function(align_to = c("panel", "plot"), by = NULL) {
 #' @export
 legend_bottom <- function(align_to = c("panel", "plot"), by = NULL) {
   if (!is.null(by)) {
-    by <- normalize_aesthetic(by)
-    guides_args <- stats::setNames(
-      list(guide_legend(position = "bottom", direction = "horizontal")),
-      by
-    )
-    return(do.call(guides, guides_args))
+    return(ggguides_guide_update(
+      by = normalize_aesthetic(by),
+      guide_params = list(position = "bottom", direction = "horizontal")
+    ))
   }
 
   align_to <- match.arg(align_to)
@@ -293,10 +285,11 @@ legend_none <- function() {
 #'   \code{"topleft"}, \code{"top"}, \code{"topright"}, \code{"left"},
 #'   \code{"center"}, \code{"right"}, \code{"bottomleft"}, \code{"bottom"},
 #'   \code{"bottomright"}. If specified, overrides \code{x} and \code{y}.
-#' @param just Justification of legend relative to the anchor point. Either a
-#'   character vector of length 2 (horizontal, vertical) or a single value.
-#'   Common values: \code{c("left", "top")}, \code{c("right", "bottom")},
+#' @param justification Justification of legend relative to the anchor point.
+#'   Either a character vector of length 2 (horizontal, vertical) or a single
+#'   value. Common values: \code{c("left", "top")}, \code{c("right", "bottom")},
 #'   \code{"center"}. If \code{NULL}, automatically determined based on position.
+#' @param just Deprecated. Use \code{justification} instead.
 #' @param background Background fill color for the legend. Default is
 #'   \code{"white"}.
 #' @param border Border color for the legend box. Default is \code{NA} (no border).
@@ -319,7 +312,7 @@ legend_none <- function() {
 #' # Using coordinates
 #' ggplot(mtcars, aes(mpg, wt, color = factor(cyl))) +
 #'   geom_point() +
-#'   legend_inside(x = 0.95, y = 0.95, just = c("right", "top"))
+#'   legend_inside(x = 0.95, y = 0.95, justification = c("right", "top"))
 #'
 #' # Custom background and border
 #' ggplot(mtcars, aes(mpg, wt, color = factor(cyl))) +
@@ -329,8 +322,14 @@ legend_none <- function() {
 #' @seealso \code{\link{legend_left}}, \code{\link{legend_right}},
 #'   \code{\link{legend_top}}, \code{\link{legend_bottom}}
 #' @export
-legend_inside <- function(x = NULL, y = NULL, position = NULL, just = NULL,
-                          background = "white", border = NA, padding = 0.2) {
+legend_inside <- function(x = NULL, y = NULL, position = NULL, justification = NULL,
+                          background = "white", border = NA, padding = 0.2,
+                          just = NULL) {
+
+  if (!is.null(just)) {
+    warning("`just` is deprecated; use `justification` instead.", call. = FALSE)
+    if (is.null(justification)) justification <- just
+  }
 
   valid_positions <- c(
     "topleft", "top", "topright",
@@ -341,20 +340,20 @@ legend_inside <- function(x = NULL, y = NULL, position = NULL, just = NULL,
   if (!is.null(position)) {
     position <- match.arg(position, valid_positions)
     coords <- switch(position,
-      "topleft"     = list(x = 0.02, y = 0.98, just = c("left", "top")),
-      "top"         = list(x = 0.50, y = 0.98, just = c("center", "top")),
-      "topright"    = list(x = 0.98, y = 0.98, just = c("right", "top")),
-      "left"        = list(x = 0.02, y = 0.50, just = c("left", "center")),
-      "center"      = list(x = 0.50, y = 0.50, just = c("center", "center")),
-      "right"       = list(x = 0.98, y = 0.50, just = c("right", "center")),
-      "bottomleft"  = list(x = 0.02, y = 0.02, just = c("left", "bottom")),
-      "bottom"      = list(x = 0.50, y = 0.02, just = c("center", "bottom")),
-      "bottomright" = list(x = 0.98, y = 0.02, just = c("right", "bottom"))
+      "topleft"     = list(x = 0.02, y = 0.98, justification = c("left", "top")),
+      "top"         = list(x = 0.50, y = 0.98, justification = c("center", "top")),
+      "topright"    = list(x = 0.98, y = 0.98, justification = c("right", "top")),
+      "left"        = list(x = 0.02, y = 0.50, justification = c("left", "center")),
+      "center"      = list(x = 0.50, y = 0.50, justification = c("center", "center")),
+      "right"       = list(x = 0.98, y = 0.50, justification = c("right", "center")),
+      "bottomleft"  = list(x = 0.02, y = 0.02, justification = c("left", "bottom")),
+      "bottom"      = list(x = 0.50, y = 0.02, justification = c("center", "bottom")),
+      "bottomright" = list(x = 0.98, y = 0.02, justification = c("right", "bottom"))
     )
     x <- coords$x
     y <- coords$y
-    if (is.null(just)) {
-      just <- coords$just
+    if (is.null(justification)) {
+      justification <- coords$justification
     }
   }
 
@@ -362,15 +361,14 @@ legend_inside <- function(x = NULL, y = NULL, position = NULL, just = NULL,
     stop("Either provide `position` or both `x` and `y` coordinates.", call. = FALSE)
   }
 
-  if (is.null(just)) {
-    just <- c("left", "top")
+  if (is.null(justification)) {
+    justification <- c("left", "top")
   }
 
-  # ggplot2 3.5.0+ uses legend.position = "inside" with legend.position.inside
   theme(
     legend.position = "inside",
     legend.position.inside = c(x, y),
-    legend.justification = just,
+    legend.justification = justification,
     legend.background = element_rect(fill = background, color = border),
     legend.margin = margin(padding, padding, padding, padding, "cm")
   )
