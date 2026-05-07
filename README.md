@@ -31,6 +31,34 @@ p + legend_style(size = 14, title_face = "bold")
 p + legend_bottom() + legend_style(background = "grey95")
 ```
 
+## Example
+
+Six legends on four sides, each one positioned and styled independently. ggplot2 lets several legends share a side; ggguides lets you pick which legend goes where, slide it along the rail, and style it without touching the others.
+
+<img src="man/figures/six_legends.svg" width="100%">
+
+```r
+p6 +
+  # Side placement. Two legends share the top rail, two share the right.
+  legend_top(by = "colour")    + legend_top(by = "fill")     +
+  legend_right(by = "size")    + legend_right(by = "alpha")  +
+  legend_bottom(by = "shape")  + legend_left(by = "linetype") +
+
+  # Slide each one along its rail.
+  legend_style(by = "colour",   justification = "left")   +
+  legend_style(by = "fill",     justification = "right")  +
+  legend_style(by = "size",     justification = "top")    +
+  legend_style(by = "alpha",    justification = "bottom") +
+
+  # Appearance (bold titles, smaller keys, smaller text, forced direction).
+  legend_style(by = "colour", title_face = "bold",
+               key_width = 0.4, key_height = 0.4) +
+  legend_style(by = "size",   title_size = 9, size = 8)  +
+  legend_style(by = "shape",  direction = "horizontal")
+```
+
+`legend_style(by = ...)` calls are additive, so one line per parameter is the intended shape. Full walkthrough in the [Multiple Legends vignette](https://gillescolling.com/ggguides/articles/multiple-legends.html#six-legends-stacked-per-side).
+
 ## Statement of Need
 
 Legend customization in ggplot2 often requires verbose `theme()` calls with non-obvious argument names (`legend.position`, `legend.justification`, `legend.box.just`), and guide specifications scattered across `guides()` and `scale_*()` functions. Common tasks like positioning a legend inside the plot, styling the legend box, or managing multiple legends require looking up documentation repeatedly.
